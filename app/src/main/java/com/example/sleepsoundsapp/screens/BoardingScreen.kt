@@ -7,51 +7,68 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.Indication
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Text
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import androidx.navigation.Navigation
 import com.example.sleepsoundsapp.R
 import com.example.sleepsoundsapp.R.*
+import com.example.sleepsoundsapp.navigation.Screen
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.rememberPagerState
+
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun BoardingScreen(navController: NavHostController) {
     val items = ArrayList<BoardingScreenData>()
     val mainWallpaperColor = Color(0xFF141927)
+    val Colors =
+        mapOf<String, Color>(
+            "colorBottom" to Color.White,
+            "colorTitle" to Color.White,
+            "buttonColor" to Color(0xFF21283f)
+        )
 
     items.add(
         BoardingScreenData(
             drawable.relax_sounds___stp_1,
-            "Эксклюзивная музыка",
-            "У нас есть авторская библиотека звуков, которую вы больше нигде не найдете"
+            "Exclusive sounds",
+            "We have an author's library of sounds that you will not find anywhere else",
+            Button = false
         )
     )
     items.add(
         BoardingScreenData(
             drawable.relax_sounds___stp2,
-            "Расслабляющие звуки для сна",
-            "Наши звуки помогут расслабиться и улучшить ваш сон"
+            "Relax sleep sounds",
+            "Our sounds will help to relax and improve your sleep health",
+            Button = false
         )
     )
     items.add(
         BoardingScreenData(
             drawable.relax_sounds___stp3,
-            "Истории для детей",
-            "Знаменитые сказки с успокаивающими звуками помогут вашим детям быстрее заснуть"
+            "Story for kids",
+            "Famous fairy tales with soothing sounds will help your children fall asleep faster",
+            Button = true
         )
     )
 
@@ -62,10 +79,13 @@ fun BoardingScreen(navController: NavHostController) {
         initialPage = 0
     )
     BoardingScreenPager(
-        item = items, pagerState, modifier = Modifier
+        Colors,
+        navController,
+        item = items, pagerState,
+        modifier = Modifier
             .fillMaxSize()
             .background(color = mainWallpaperColor)
-            .padding(horizontal = 24.dp)
+            .padding(horizontal = 24.dp),
     )
 }
 
@@ -73,30 +93,69 @@ fun BoardingScreen(navController: NavHostController) {
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun BoardingScreenPager(
+    colors: Map<String, Color>,
+    navController: NavHostController,
     item: List<BoardingScreenData>,
     pagerState: PagerState,
     modifier: Modifier = Modifier,
     modifierText: Modifier = Modifier,
-) {
+
+    ) {
     Box(modifier = modifier) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally)
-        {
-            HorizontalPager(state = pagerState) { page ->
-                Column(
-                    modifier = Modifier
-                        .padding(top = 60.dp)
-                        .fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Image(
-                        painter = painterResource(id = item[page].Image),
-                        contentDescription = item[page].Title
+        HorizontalPager(state = pagerState) { page ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = 111.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Image(
+                    painter = painterResource(id = item[page].Image),
+                    contentDescription = item[page].Title,
+                    modifier = Modifier.padding(bottom = 50.dp)
+                )
+                colors["colorTitle"]?.let {
+                    Text(
+                        fontWeight = FontWeight.Bold,
+                        text = item[page].Title,
+                        color = it,
+                        fontSize = 34.sp,
+                        modifier = Modifier.padding(bottom = 8.dp), textAlign = TextAlign.Center
                     )
-                    Text(text = item[page].Title, color = Color.White, fontSize = 34.sp)
-                    Text(text = item[page].Text, color = Color.White, fontSize = 16.sp)
                 }
 
+                colors["colorBottom"]?.let {
+                    Text(
+                        text = item[page].Text,
+                        color = it,
+                        fontSize = 16.sp,
+                        modifier = Modifier
+                            .padding(bottom = 64.dp)
+                            .alpha(0.6f),
+                        textAlign = TextAlign.Center,
+                    )
+                }
+
+                PagerIndicator(item.size, pagerState.currentPage)
+
+                if (item[page].Button) {
+                    colors["buttonColor"]?.let {
+                        Button(
+                            onClick = { navController.navigate(Screen.Home.route) },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 24.dp)
+                                .height(50.dp),
+                            shape = RoundedCornerShape(8.dp),
+                            colors = ButtonDefaults.buttonColors(backgroundColor = it)
+                        ) {
+                            Text(text = "Next", fontSize = 16.sp, color = Color.White)
+                        }
+                    }
+                }
             }
-            PagerIndicator(item.size, pagerState.currentPage)
+
+
         }
     }
 }
@@ -111,7 +170,6 @@ fun PagerIndicator(size: Int, currentPage: Int) {
 }
 
 @Composable
-
 fun Indicator(isSelected: Boolean) {
     val width = animateDpAsState(targetValue = if (isSelected) 20.dp else 10.dp)
     Box(

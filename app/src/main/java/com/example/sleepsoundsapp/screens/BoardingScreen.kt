@@ -146,7 +146,7 @@ fun BoardingScreenPager(
                                 .fillMaxWidth()
                                 .padding(top = 24.dp)
                                 .height(50.dp),
-                            shape = RoundedCornerShape(8.dp),
+                            shape = RoundedCornerShape(10.dp),
                             colors = ButtonDefaults.buttonColors(backgroundColor = it)
                         ) {
                             Text(text = "Next", fontSize = 16.sp, color = Color.White)

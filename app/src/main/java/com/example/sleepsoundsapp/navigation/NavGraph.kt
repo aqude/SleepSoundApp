@@ -21,7 +21,7 @@ fun SetupNavGraph(
             BoardingScreen(navController = navController)
         }
         composable(route = Screen.Home.route) {
-            HomeScreen(navController = navController)
+//            HomeScreen(navController = navController)
         }
     }
 }

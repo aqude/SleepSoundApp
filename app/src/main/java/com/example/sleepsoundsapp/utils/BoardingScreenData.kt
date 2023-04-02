@@ -1,4 +1,4 @@
-package com.example.sleepsoundsapp.screens
+package com.example.sleepsoundsapp.utils
 
 data class BoardingScreenData(
     val Image: Int,
